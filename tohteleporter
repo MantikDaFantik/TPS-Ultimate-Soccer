@@ -1,0 +1,162 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+-- Get player and create UI
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- UI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TeleportUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Main Frame with custom background
+local mainFrame = Instance.new("ImageLabel")
+mainFrame.Size = UDim2.new(0, 300, 0, 270)
+mainFrame.Position = UDim2.new(0.5, -150, 0.8, -135)
+mainFrame.BackgroundTransparency = 1
+mainFrame.Image = "rbxassetid://130598370208416" -- Your background image
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.ScaleType = Enum.ScaleType.Crop
+mainFrame.Parent = screenGui
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Rounded corners
+local corner = Instance.new("UICorner", mainFrame)
+corner.CornerRadius = UDim.new(0, 12)
+
+-- Dark overlay for readability
+local overlay = Instance.new("Frame")
+overlay.Size = UDim2.new(1, 0, 1, 0)
+overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+overlay.BackgroundTransparency = 0.4
+overlay.Parent = mainFrame
+Instance.new("UICorner", overlay).CornerRadius = UDim.new(0, 12)
+
+-- Title (Company name)
+local company = Instance.new("TextLabel")
+company.Size = UDim2.new(1, 0, 0, 25)
+company.Position = UDim2.new(0, 0, 0, 5)
+company.BackgroundTransparency = 1
+company.Text = "w1nd scripts"
+company.Font = Enum.Font.GothamBold
+company.TextSize = 18
+company.TextColor3 = Color3.fromRGB(100, 200, 255)
+company.TextXAlignment = Enum.TextXAlignment.Center
+company.Parent = overlay
+
+-- Script Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "Finish Teleporter - @kamani94"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextXAlignment = Enum.TextXAlignment.Center
+title.Parent = overlay
+
+-- Teleport Button
+local teleportButton = Instance.new("TextButton")
+teleportButton.Size = UDim2.new(0.8, 0, 0, 35)
+teleportButton.Position = UDim2.new(0.1, 0, 0.25, 0)
+teleportButton.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+teleportButton.Text = "Teleport to finish"
+teleportButton.Font = Enum.Font.GothamBold
+teleportButton.TextSize = 16
+teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+teleportButton.Parent = overlay
+Instance.new("UICorner", teleportButton).CornerRadius = UDim.new(0, 10)
+
+-- Instruction text
+local instructionLabel = Instance.new("TextLabel")
+instructionLabel.Size = UDim2.new(0.9, 0, 0, 40)
+instructionLabel.Position = UDim2.new(0.05, 0, 0.42, 0)
+instructionLabel.BackgroundTransparency = 1
+instructionLabel.Text = "To receive the cash you need to step off the carpet"
+instructionLabel.Font = Enum.Font.Gotham
+instructionLabel.TextSize = 14
+instructionLabel.TextColor3 = Color3.fromRGB(200, 255, 200)
+instructionLabel.TextXAlignment = Enum.TextXAlignment.Center
+instructionLabel.TextWrapped = true
+instructionLabel.Parent = overlay
+
+-- Discord Label
+local discordLabel = Instance.new("TextButton")
+discordLabel.Size = UDim2.new(0.9, 0, 0, 30)
+discordLabel.Position = UDim2.new(0.05, 0, 0.65, 0)
+discordLabel.BackgroundTransparency = 1
+discordLabel.Text = "Discord: https://discord.gg/jaBa5x5xa5"
+discordLabel.Font = Enum.Font.GothamBold
+discordLabel.TextSize = 16
+discordLabel.TextColor3 = Color3.fromRGB(150, 150, 255)
+discordLabel.TextXAlignment = Enum.TextXAlignment.Center
+discordLabel.AutoButtonColor = false
+discordLabel.Parent = overlay
+
+discordLabel.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard("https://discord.gg/jaBa5x5xa5")
+        discordLabel.Text = "Copied Discord link!"
+        task.wait(1.5)
+        discordLabel.Text = "Discord: https://discord.gg/jaBa5x5xa5"
+    end
+end)
+
+-- Toggle UI instruction
+local toggleHint = Instance.new("TextLabel")
+toggleHint.Size = UDim2.new(1, 0, 0, 20)
+toggleHint.Position = UDim2.new(0, 0, 0.88, 0)
+toggleHint.BackgroundTransparency = 1
+toggleHint.Text = "Press 0 to hide/show UI"
+toggleHint.Font = Enum.Font.GothamBold
+toggleHint.TextSize = 14
+toggleHint.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleHint.TextXAlignment = Enum.TextXAlignment.Center
+toggleHint.Parent = overlay
+
+-- Teleport function
+local function teleportToPart()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
+    -- Get the target part with the correct path
+    local targetPart = workspace.tower.sections.finish.exit.carpet
+    
+    if targetPart and targetPart:IsA("BasePart") then
+        -- Teleport the character to the part's position
+        humanoidRootPart.CFrame = targetPart.CFrame + Vector3.new(0, 5, 0)
+        print("Teleported to carpet part:", targetPart.Name)
+        
+        -- Show success message
+        teleportButton.Text = "Teleported!"
+        teleportButton.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+        task.wait(2)
+        teleportButton.Text = "Teleport to finish"
+        teleportButton.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+    else
+        warn("Carpet part not found or is not a BasePart")
+        teleportButton.Text = "Error: Part not found"
+        teleportButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        task.wait(2)
+        teleportButton.Text = "Teleport to finish"
+        teleportButton.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+    end
+end
+
+-- Connect teleport button
+teleportButton.MouseButton1Click:Connect(function()
+    teleportToPart()
+end)
+
+-- Show/hide logic
+local UIVisible = true
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.Zero then
+        UIVisible = not UIVisible
+        screenGui.Enabled = UIVisible
+    end
+end)
